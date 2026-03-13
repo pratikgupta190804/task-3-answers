@@ -76,6 +76,7 @@ Training on both scripts ensures that the tokenizer learns **shared subword unit
 
 After training, each file was encoded using the trained tokenizer.
 
+Encoding English National Anthem
 ```bash
 abctokz encode --model artifacts/task3_anthem_bpe --input data/input_english_national_anthem.txt
 ```
@@ -199,7 +200,7 @@ Encoding: जन गण मन
 
 ## Metrics
 
-### Token Count
+1. Token Count
 
 script
  ```bash
@@ -235,7 +236,7 @@ English token count: 318
 Devanagari token count: 227
 ```
 
-###Fertility
+2. Fertility
 
 The key metric used in this experiment is **Fertility**, defined as:
 
@@ -249,11 +250,50 @@ Higher fertility means **more token fragmentation**, indicating lower tokenizati
 ---
 
 ## Results
+Script
+```bash
+@'
+from pathlib import Path
+from abctokz import Tokenizer
+from abctokz.eval.metrics import fertility
+
+model = r"artifacts\task3_anthem_bpe"
+eng_file = r"data\input_english_national_anthem.txt"
+dev_file = r"data\input_devanagari_national_anthem.txt"
+
+tok = Tokenizer.load(model)
+
+def read_lines(p):
+    return [x.strip() for x in Path(p).read_text(encoding="utf-8").splitlines() if x.strip()]
+
+def word_counts(lines):
+    return [len(line.split()) for line in lines]
+
+eng_lines = read_lines(eng_file)
+dev_lines = read_lines(dev_file)
+
+eng_enc = [tok.encode(line) for line in eng_lines]
+dev_enc = [tok.encode(line) for line in dev_lines]
+
+eng_words = word_counts(eng_lines)
+dev_words = word_counts(dev_lines)
+
+eng_tokens = sum(len(e) for e in eng_enc)
+dev_tokens = sum(len(e) for e in dev_enc)
+
+eng_fert = fertility(eng_enc, eng_words)
+dev_fert = fertility(dev_enc, dev_words)
+
+print("English -> tokens:", eng_tokens, "words:", sum(eng_words), "fertility:", eng_fert)
+print("Devanagari -> tokens:", dev_tokens, "words:", sum(dev_words), "fertility:", dev_fert)
+'@ | python -
+```
+output
 
 | Script                  | Tokens | Words | Fertility |
 | ----------------------- | ------ | ----- | --------- |
-| English Transliteration | TBD    | TBD   | TBD       |
-| Devanagari              | TBD    | TBD   | TBD       |
+| English Transliteration | 70     | 11  1 | 6.36      |
+| Devanagari              | 52    1| 11  1 | 4.72      |
 
 ---
 
