@@ -350,7 +350,3 @@ This experiment demonstrates an important property of tokenization:
 > **Token efficiency strongly depends on the tokenizer’s training data and vocabulary coverage.**
 
 A tokenizer trained on limited text will split words into many small pieces, while a tokenizer trained on large multilingual corpora can encode the same text using far fewer tokens.
-
----
-
-If you want, I can also show you **3 small improvements that will make this README look like a professional GitHub research submission** (the type that impresses hackathon judges).
