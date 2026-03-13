@@ -1,81 +1,118 @@
-# Task 3 - The National Anthem Test
+# Task 3 — The National Anthem Test
 
-Model Used: BPE(Byte Pair Encoding)
+Model Used: BPE(Byte Pair Encoder)
 
-## Goal
-Compare tokenization behavior for the first stanza of Jana Gana Mana in:
-- English transliteration
-- Devanagari
+## Setup
 
-## Input Texts Used
-- input_english_national_anthem.txt (First Stanza)
-  जन गण मन अधिनायक जय हे भारत भाग्य विधाता पंजाब सिंधु
-- input_devanagari_national_anthem.txt (First Stanza)
-  Jana Gana Mana Adhinayaka Jaya He Bharata Bhagya Vidhata Punjab Sindhu
+### Inputs
 
-## Method
-1. Train one shared BPE tokenizer on both files.
-2. Encode both files with the same trained model.
-3. Count total tokens per script.
-4. Compute fertility as:
+### 1. English Transliteration
 
-Fertility = total_tokens / total_words
+**File:** `input_english_national_anthem.txt`
 
-## Model Setup
-- Model type: BPE
-- Vocab size: 300
-- Output artifact: artifacts/task3_anthem_bpe
+```
+Jana Gana Mana Adhinayaka Jaya He
+Bharata Bhagya Vidhata
+Punjab Sindhu Gujarat Maratha
+Dravida Utkala Banga
+Vindhya Himachala Yamuna Ganga
+Ucchala Jaladhi Taranga
+Tava Shubha Name Jage
+Tava Shubha Ashisha Mage
+Gahe Tava Jaya Gatha
+Jana Gana Mangala Dayaka Jaya He
+Bharata Bhagya Vidhata
+Jaya He Jaya He Jaya He
+Jaya Jaya Jaya Jaya He
+```
 
-## Results (Placeholder Values - Update Later)
+---
 
-### 1. Token Counts
-- English transliteration token count: 84
-- Devanagari token count: 101
+### 2. Devanagari Script
 
-### 2. Word Counts
-- English transliteration word count: 52
-- Devanagari word count: 52
+**File:** `input_devanagari_national_anthem.txt`
 
-### 3. Fertility Scores
-- English transliteration fertility: 84 / 52 = 1.615
-- Devanagari fertility: 101 / 52 = 1.942
+```
+जन गण मन अधिनायक जय हे
+भारत भाग्य विधाता
+पंजाब सिंधु गुजरात मराठा
+द्राविड़ उत्कल बंग
+विंध्य हिमाचल यमुना गंगा
+उच्छल जलधि तरंग
+तव शुभ नामे जागे
+तव शुभ आशीष मागे
+गाहे तव जय गाथा
+जन गण मंगलदायक जय हे
+भारत भाग्य विधाता
+जय हे जय हे जय हे
+जय जय जय जय हे
+```
 
-## Interpretation
-The Devanagari version shows higher token count and fertility in this run. The most likely reasons are:
+---
 
-1. Script characteristics
-Devanagari words are often represented as richer grapheme patterns, and a small BPE vocabulary may split these patterns more often than transliterated Latin text.
+## Tokenizer Training
 
-2. Vocabulary pressure in a shared model
-A single vocab of size 300 must serve two scripts. That creates competition between English-character subwords and Devanagari subwords, which can increase fragmentation for one or both scripts.
+The tokenizer was trained using both scripts to simulate a **multilingual vocabulary**.
 
-3. Training data size and coverage
-If the anthem text itself is short (and the full training corpus is limited), many meaningful chunks are not learned as stable merges. This increases token count, especially for less frequent script patterns.
+```bash
+abctokz train \
+  --corpus data/input_devanagari_national_anthem.txt data/input_english_national_anthem.txt \
+  --model bpe \
+  --vocab-size 300 \
+  --output artifacts/task3_anthem_bpe
+```
 
-4. Pre-tokenization and normalization effects
-Whitespace boundaries, punctuation handling, and script-aware normalization can all alter how subwords are formed, which directly affects fertility.
+Training on both scripts ensures that the tokenizer learns **shared subword units across languages**, which allows us to compare tokenization behavior between Latin transliteration and Devanagari.
 
-## Bonus: External Tokenizer Comparison (Placeholder Values)
-External tokenizer: tiktoken (cl100k_base)
+---
 
-- English transliteration tokens: 68
-- Devanagari tokens: 124
+## Encoding
 
-Approx fertility (using same 52-word denominator):
-- English transliteration: 68 / 52 = 1.308
-- Devanagari: 124 / 52 = 2.385
+After training, each file was encoded using the trained tokenizer.
 
-## What This Difference Reveals
-Compared with the project tokenizer, the external tokenizer appears:
-- More efficient on English transliteration (lower fertility)
-- Less efficient on Devanagari in this example (higher fertility)
+```bash
+abctokz encode --model artifacts/task3_anthem_bpe --input data/input_english_national_anthem.txt
+abctokz encode --model artifacts/task3_anthem_bpe --input data/input_devanagari_national_anthem.txt
+```
 
-This usually indicates that the external tokenizer vocabulary is more optimized for high-frequency web and English-centric patterns than for this specific Devanagari text. In contrast, a custom tokenizer trained with balanced Indic data can reduce Devanagari fragmentation.
+Token counts and fertility metrics were then computed using the repository’s evaluation utilities.
 
-## Final Conclusion (Draft)
-In this experiment, Devanagari has higher fertility than English transliteration. The difference is driven by a combination of:
-- script-level segmentation behavior,
-- limited shared vocabulary size,
-- and corpus coverage during training.
+---
 
-After replacing placeholder values with measured values, this report can be used as the final Task 3 submission.
+## Metrics
+
+The key metric used in this experiment is **Fertility**, defined as:
+
+```
+fertility = tokens / words
+```
+
+This metric indicates how many tokens are produced per word.
+Higher fertility means **more token fragmentation**, indicating lower tokenization efficiency.
+
+---
+
+## Results
+
+| Script                  | Tokens | Words | Fertility |
+| ----------------------- | ------ | ----- | --------- |
+| English Transliteration | TBD    | TBD   | TBD       |
+| Devanagari              | TBD    | TBD   | TBD       |
+
+---
+
+## Goal of the Experiment
+
+This experiment evaluates how a multilingual tokenizer handles:
+
+* Latin transliteration vs. native script
+* Vocabulary allocation across scripts
+* Token fragmentation differences
+
+The results help reveal **biases in tokenizer vocabulary and training data coverage**.
+
+---
+
+## Bonus Experiment
+
+For comparison, the same text can also be encoded using the tokenizer used by modern large language models via the **`tiktoken`** library. This provides a reference point for how production tokenizers handle Indic scripts.
