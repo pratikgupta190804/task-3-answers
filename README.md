@@ -50,16 +50,22 @@ Jaya Jaya Jaya Jaya He
 
 ---
 
-## Tokenizer Training
+## Training
 
 The tokenizer was trained using both scripts to simulate a **multilingual vocabulary**.
 
 ```bash
-abctokz train \
-  --corpus data/input_devanagari_national_anthem.txt data/input_english_national_anthem.txt \
-  --model bpe \
-  --vocab-size 300 \
-  --output artifacts/task3_anthem_bpe
+abctokz train --corpus data/input_devanagari_national_anthem.txt --corpus data/input_english_national_anthem.txt --model bpe --vocab-size 300 --output artifacts/task3_anthem_bpe
+```
+
+Result:
+```bash
+Training bpe tokenizer...
+  Corpus: ['data\\input_devanagari_national_anthem.txt', 
+'data\\input_english_national_anthem.txt']
+  Output: artifacts\task3_anthem_bpe
+Done! Tokenizer saved to artifacts\task3_anthem_bpe
+  Vocabulary size: 1
 ```
 
 Training on both scripts ensures that the tokenizer learns **shared subword units across languages**, which allows us to compare tokenization behavior between Latin transliteration and Devanagari.
@@ -72,10 +78,116 @@ After training, each file was encoded using the trained tokenizer.
 
 ```bash
 abctokz encode --model artifacts/task3_anthem_bpe --input data/input_english_national_anthem.txt
+```
+Result
+```bash 
+┏━━━━━┳━━━━━━━┳━━━━┓
+┃ Pos ┃ Token ┃ ID ┃
+┡━━━━━╇━━━━━━━╇━━━━┩
+│   0 │ J     │  0 │
+│   1 │ ##a   │  0 │
+│   2 │ ##n   │  0 │
+│   3 │ ##a   │  0 │
+│   4 │ ##    │  0 │
+│   5 │ ##G   │  0 │
+│   6 │ ##a   │  0 │
+│   7 │ ##n   │  0 │
+│   8 │ ##a   │  0 │
+│   9 │ ##    │  0 │
+│  10 │ ##M   │  0 │
+│  11 │ ##a   │  0 │
+│  12 │ ##n   │  0 │
+│  13 │ ##a   │  0 │
+│  14 │ ##    │  0 │
+│  15 │ ##A   │  0 │
+│  16 │ ##d   │  0 │
+│  17 │ ##h   │  0 │
+│  18 │ ##i   │  0 │
+│  19 │ ##n   │  0 │
+│  20 │ ##a   │  0 │
+│  21 │ ##y   │  0 │
+│  22 │ ##a   │  0 │
+│  23 │ ##k   │  0 │
+│  24 │ ##a   │  0 │
+│  25 │ ##    │  0 │
+│  26 │ ##J   │  0 │
+│  27 │ ##a   │  0 │
+│  28 │ ##y   │  0 │
+│  29 │ ##a   │  0 │
+│  30 │ ##    │  0 │
+│  31 │ ##H   │  0 │
+│  32 │ ##e   │  0 │
+│  33 │ ##    │  0 │
+│  34 │ ##B   │  0 │
+│  35 │ ##h   │  0 │
+│  36 │ ##a   │  0 │
+│  37 │ ##r   │  0 │
+│  38 │ ##a   │  0 │
+│  39 │ ##t   │  0 │
+│  40 │ ##a   │  0 │
+│  41 │ ##    │  0 │
+│  42 │ ##B   │  0 │
+│  43 │ ##h   │  0 │
+│  44 │ ##a   │  0 │
+│  45 │ ##g   │  0 │
+│  46 │ ##y   │  0 │
+│  47 │ ##a   │  0 │
+│  48 │ ##    │  0 │
+│  49 │ ##V   │  0 │
+│  50 │ ##i   │  0 │
+│  51 │ ##d   │  0 │
+│  52 │ ##h   │  0 │
+│  53 │ ##a   │  0 │
+│  54 │ ##t   │  0 │
+│  55 │ ##a   │  0 │
+│  56 │ ##    │  0 │
+│  57 │ ##P   │  0 │
+│  58 │ ##u   │  0 │
+│  59 │ ##n   │  0 │
+│  60 │ ##j   │  0 │
+│  61 │ ##a   │  0 │
+│  62 │ ##b   │  0 │
+│  63 │ ##    │  0 │
+│  64 │ ##S   │  0 │
+│  65 │ ##i   │  0 │
+│  66 │ ##n   │  0 │
+│  67 │ ##d   │  0 │
+│  68 │ ##h   │  0 │
+│  69 │ ##u   │  0 │
+└─────┴───────┴────┘
+```
+Encoding Devanagari
+```bash
 abctokz encode --model artifacts/task3_anthem_bpe --input data/input_devanagari_national_anthem.txt
 ```
-
-Token counts and fertility metrics were then computed using the repository’s evaluation utilities.
+Result
+```bash    
+┏━━━━━┳━━━━━━━┳━━━━┓
+┃ Pos ┃ Token ┃ ID ┃
+┡━━━━━╇━━━━━━━╇━━━━┩
+│   0 │ जन    │ 73 │
+│   1 │ ##    │  0 │
+│   2 │ ##ग   │ 30 │
+│   3 │ ##ण   │ 33 │
+│   4 │ ##    │  0 │
+│   5 │ ##म   │  0 │
+│   6 │ ##न   │ 39 │
+│   7 │ ##    │  0 │
+│   8 │ ##अ   │  0 │
+│   9 │ ##ध   │ 36 │
+│  10 │ ##ि    │ 46 │
+│  11 │ ##न   │ 39 │
+│  12 │ ##ा    │ 45 │
+│  13 │ ##य   │ 41 │
+│  14 │ ##क   │  0 │
+│  15 │ ##    │  0 │
+│  16 │ ##ज   │  0 │
+│  17 │ ##य   │ 41 │
+│  18 │ ##    │  0 │
+│  19 │ ##ह   │  0 │
+│  20 │ ##े    │ 50 │
+└─────┴───────┴────┘
+```
 
 ---
 
