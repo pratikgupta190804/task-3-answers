@@ -1,7 +1,6 @@
 # Task 3 — The National Anthem Tokenization Test
 
-## Model Used
-
+Model Used:
 **BPE (Byte Pair Encoding)**
 
 ---
